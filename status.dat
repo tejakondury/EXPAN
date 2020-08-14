@@ -1,0 +1,18 @@
+Current status of the directory
+11/5/2020.
+
+Finished running pore pressure sensitivity simulations
+
+look out for changes in:
+
+pore_pressure module in ablation_base.py
+
+parent.py, analysis temperatures
+
+meshing seed set accurately for the packings used, will need to reset seed for other packings
+
+all results are stored inside the results folder
+
+new git branch done to be current and avoid issues working locally with files (merge conflicts)
+
+
