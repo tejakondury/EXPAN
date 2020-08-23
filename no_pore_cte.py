@@ -124,7 +124,7 @@ a.setElementType(regions=pickedRegions,elemTypes=(elemType1,))
 # Generate mesh
 a = mdb.models['Model-1'].rootAssembly
 partInstances =(a.instances['Part-1-1'], )
-a.seedPartInstance(regions=partInstances, size=0.01,
+a.seedPartInstance(regions=partInstances, size=0.05,
     minSizeFactor=0.1)
 a = mdb.models['Model-1'].rootAssembly
 partInstances =(a.instances['Part-1-1'], )
@@ -172,6 +172,7 @@ a.Set(edges=edges1, xVertices=xVerts1, name='bottom')
 n1 = []
 for i in a.sets['left'].nodes:
     n1.append((i.coordinates[0],i.coordinates[1],i.coordinates[2],i.label))
+
 n1.sort()
 
 #Create a set from individual nodes in set above
@@ -185,6 +186,7 @@ for i in n1:
 n2 = []
 for i in a.sets['right'].nodes:
     n2.append((i.coordinates[0],i.coordinates[1],i.coordinates[2],i.label))
+
 n2.sort()
 
 #Create a set from individual nodes in set above
@@ -198,6 +200,7 @@ for i in n2:
 n3 = []
 for i in a.sets['top'].nodes:
     n3.append((i.coordinates[0],i.coordinates[1],i.coordinates[2],i.label))
+
 n3.sort()
 
 nodeno3 = 1
@@ -210,6 +213,7 @@ for i in n3:
 n4 = []
 for i in a.sets['bottom'].nodes:
     n4.append((i.coordinates[0],i.coordinates[1],i.coordinates[2],i.label))
+
 n4.sort()
 
 nodeno4 = 1
@@ -217,6 +221,8 @@ for i in n4:
     setName = 'BottomNode-' + str(nodeno4)
     nodeset = a.SetFromNodeLabels(name = setName,nodeLabels = (('Part-1-1', (i[3],),),),)
     nodeno4 += 1
+
+
 ###########################################################################################
 # Create dummy node
 a = mdb.models['Model-1'].rootAssembly
@@ -249,22 +255,19 @@ a.Set(referencePoints=dummy, name='dummy2')
 
 #Apply constraint equation to each corresponding node for Periodic Boundary Condition (left to right faces, x faces)
 for j in range(1,nodeno1):
-
-    mdb.models['Model-1'].Equation(name='LeftRight-xdisp-Constraint-%d'%(j), terms=((1.0, 'LeftNode-%d'%(j), 1), (-1.0, 'RightNode-%d'%(j), 1),(-1.0, 'dummy', 1)))
-    mdb.models['Model-1'].Equation(name='LeftRight-ydisp-Constraint-%d'%(j), terms=((1.0, 'LeftNode-%d'%(j), 2), (-1.0, 'RightNode-%d'%(j), 2),(-1.0, 'dummy', 2)))
-
+	mdb.models['Model-1'].Equation(name='LeftRight-xdisp-Constraint-%d'%(j), terms=((1.0, 'LeftNode-%d'%(j), 1), (-1.0, 'RightNode-%d'%(j), 1),(-1.0, 'dummy', 1)))
+	mdb.models['Model-1'].Equation(name='LeftRight-ydisp-Constraint-%d'%(j), terms=((1.0, 'LeftNode-%d'%(j), 2), (-1.0, 'RightNode-%d'%(j), 2),(-1.0, 'dummy', 2)))
+	#mdb.models['Model-1'].Equation(name='LeftRight-temp-Constraint-%d'%(j), terms=((1.0, 'LeftNode-%d'%(j), 1), (-1.0, 'RightNode-%d'%(j), 1),(-1.0, 'dummy', 11)))
 
 #Apply constraint equation to each corresponding node for Periodic Boundary Condition (top to bottom faces, y faces)
 for j in range(1,nodeno3):
+	mdb.models['Model-1'].Equation(name='TopBottom-disp-Constraint-%d'%(j), terms=((1.0, 'TopNode-%d'%(j), 1), (-1.0, 'BottomNode-%d'%(j), 1),(-1.0, 'dummy2', 1)))
+	mdb.models['Model-1'].Equation(name='TopBottom-disp-Constraint-%d'%(j), terms=((1.0, 'TopNode-%d'%(j), 2), (-1.0, 'BottomNode-%d'%(j), 2),(-1.0, 'dummy2', 2)))
+	#mdb.models['Model-1'].Equation(name='TopBottom-temp-Constraint-%d'%(j), terms=((1.0, 'TopNode-%d'%(j), 1), (-1.0, 'BottomNode-%d'%(j), 1),(-1.0, 'dummy2', 11)))
 
-    mdb.models['Model-1'].Equation(name='TopBottom-disp-Constraint-%d'%(j), terms=((1.0, 'TopNode-%d'%(j), 1), (-1.0, 'BottomNode-%d'%(j), 1),(-1.0, 'dummy2', 1)))
-    mdb.models['Model-1'].Equation(name='TopBottom-disp-Constraint-%d'%(j), terms=((1.0, 'TopNode-%d'%(j), 2), (-1.0, 'BottomNode-%d'%(j), 2),(-1.0, 'dummy2', 2)))
 
 
 ###################################################################################
-# Create step
-#a = mdb.models['Model-1'].rootAssembly
-#mdb.models['Model-1'].StaticStep(name='Step-1', previous='Initial')
 
 mdb.models['Model-1'].CoupledTempDisplacementStep(name='Step-1',
         previous='Initial', response=STEADY_STATE, deltmx=None, cetol=None,
@@ -277,13 +280,17 @@ a = mdb.models['Model-1'].rootAssembly
 r1 = a.referencePoints
 refPoints1=dummy=(r1[val1], )
 region = regionToolset.Region(referencePoints=refPoints1)
-mdb.models['Model-1'].TemperatureBC(name='BC-1', createStepName='Step-1',
-    region=region, amplitude=UNSET, fixed=OFF,
-    distributionType=UNIFORM, fieldName='', magnitude=100.0)
+mdb.models['Model-1'].DisplacementBC(name='BC-1', createStepName='Step-1',
+    region=region,u1=0.0,u2=0.0,ur3=UNSET, amplitude=UNSET, fixed=OFF,
+    distributionType=UNIFORM, fieldName='' )
 
-
-
-
+a=mdb.models['Model-1'].rootAssembly
+f1 = a.instances['Part-1-1'].faces
+faces1=f1.getByBoundingBox(0,0,0,1,1,0)
+region=(faces1,)
+mdb.models['Model-1'].TemperatureBC(name='BC-2', createStepName='Step-1',
+	region=region, fixed=OFF, distributionType=UNIFORM, fieldName='',
+	magnitude=100.0, amplitude=UNSET)
 
 #######################################################################################
 
@@ -298,6 +305,11 @@ mdb.Job(name='Job%d' %tt, model='Model-1', description='', type=ANALYSIS,
 
 mdb.models['Model-1'].FieldOutputRequest(name='F-Output-2',
     createStepName='Step-1', variables=('IVOL', ))
+mdb.models['Model-1'].FieldOutputRequest(name='F-Output-3',
+    createStepName='Step-1', variables=('THE', ))
+mdb.models['Model-1'].FieldOutputRequest(name='F-Output-4',
+    createStepName='Step-1', variables=('TEMP', ))
+
 
 mdb.saveAs('/home/u23/tejakondury/EXPAN/mod%d' %tt)
 ###########################################################################################
@@ -322,8 +334,8 @@ numFrames = len(myodb.steps['Step-1'].frames) #total number of frames
 
 vol = myodb.steps['Step-1'].frames[-1].fieldOutputs['IVOL']
 stress=myodb.steps['Step-1'].frames[-1].fieldOutputs['S']
-strain=myodb.steps['Step-1'].frames[-1].fieldOutputs['E']
-temp=myodb.steps['Step-1'].frames[-1].fieldOutputs['NT11']
+strain=myodb.steps['Step-1'].frames[-1].fieldOutputs['THE']
+temp=myodb.steps['Step-1'].frames[-1].fieldOutputs['TEMP']
 #temp=myodb.steps['Step-1'].frames[-1].fieldOutputs['TEMP']
 comp=0;    # change here if you are loading in different direction other than x-direction
 totVol = 0.0
@@ -336,7 +348,7 @@ for j in xrange(0,len(vol.values)):
 	totVol += setVol
 	totStress += stress.values[j].data[comp]*setVol
 	totStrain += strain.values[j].data[comp]*setVol
-	totTemp +=temp.values[j].data[comp]*setVol
+	totTemp +=temp.values[j].data*setVol
 
 totStress=totStress/totVol
 totStrain=totStrain/totVol
