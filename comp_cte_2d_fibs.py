@@ -37,7 +37,20 @@ f.close()
 f=open('cond-pore%d'%tt,'rb')
 cond_pore_var=pk.load(f)
 f.close()
-#!!!! incomplete include fiber properties
+
+f=open('mod-fib%d'%tt,'rb')
+mod_pore_var=pk.load(f)
+f.close()
+f=open('pois-fib%d'%tt,'rb')
+pois_pore_var=pk.load(f)
+f.close()
+f=open('cte-fib%d'%tt,'rb')
+cte_pore_var=pk.load(f)
+f.close()
+f=open('cond-fib%d'%tt,'rb')
+cond_pore_var=pk.load(f)
+f.close()
+
 Mdb
 
 ##############################################################
@@ -164,7 +177,7 @@ a.Instance(name='Part-1-1', part=p, dependent=OFF)
 ##################################
 
 # Assign element types
-elemType1=mesh.ElemType(elemCode=CPS4R,elemLibrary=STANDARD)
+elemType1=mesh.ElemType(elemCode=CPE4T,elemLibrary=STANDARD)
 p=mdb.models['Model-1'].parts['Part-1']
 a = mdb.models['Model-1'].rootAssembly
 f1 =a.instances['Part-1-1'].faces
@@ -178,7 +191,7 @@ a.setElementType(regions=pickedRegions,elemTypes=(elemType1,))
 # Generate mesh
 a = mdb.models['Model-1'].rootAssembly
 partInstances =(a.instances['Part-1-1'], )
-a.seedPartInstance(regions=partInstances, size=0.005,deviationFactor=0.08,
+a.seedPartInstance(regions=partInstances, size=0.05,deviationFactor=0.08,
     minSizeFactor=0.1)
 a.generateMesh(regions=partInstances)
 
@@ -321,20 +334,43 @@ for j in range(1,nodeno3):
 
 ###################################################################################
 # Create step
-a = mdb.models['Model-1'].rootAssembly
-mdb.models['Model-1'].StaticStep(name='Step-1', previous='Initial')
+#a = mdb.models['Model-1'].rootAssembly
+#mdb.models['Model-1'].StaticStep(name='Step-1', previous='Initial')
+# using a coupled-temperature displaement step
+mdb.models['Model-1'].CoupledTempDisplacementStep(name='Step-1',
+        previous='Initial', response=STEADY_STATE, deltmx=None, cetol=None,
+        creepIntegration=None, amplitude=RAMP)
 
 ######################################################################################
 
-# Apply BCs
+# Apply PBCs
+# In the x-direction
 a = mdb.models['Model-1'].rootAssembly
 r1 = a.referencePoints
 refPoints1=dummy=(r1[val1], )
 region = regionToolset.Region(referencePoints=refPoints1)
 mdb.models['Model-1'].DisplacementBC(name='BC-1', createStepName='Step-1',
-    region=region,u1=-0.1,u2=0.0,ur3=UNSET, amplitude=UNSET, fixed=OFF,
+    region=region,u1=0.0,u2=UNSET,ur3=UNSET, amplitude=UNSET, fixed=OFF,
     distributionType=UNIFORM, fieldName='' )
 
+# In the y-direction
+a = mdb.models['Model-1'].rootAssembly
+r1 = a.referencePoints
+refPoints1=dummy=(r1[val1], )
+region = regionToolset.Region(referencePoints=refPoints1)
+mdb.models['Model-1'].DisplacementBC(name='BC-1', createStepName='Step-1',
+    region=region,u1=UNSET,u2=0.0,ur3=UNSET, amplitude=UNSET, fixed=OFF,
+    distributionType=UNIFORM, fieldName='' )
+
+
+# applying uniform temperature boundary conditions
+a=mdb.models['Model-1'].rootAssembly
+f1 = a.instances['Part-1-1'].faces
+faces1=f1.getByBoundingBox(0,0,0,1,1,0)
+region=(faces1,)
+mdb.models['Model-1'].TemperatureBC(name='BC-2', createStepName='Step-1',
+	region=region, fixed=OFF, distributionType=UNIFORM, fieldName='',
+	magnitude=100.0, amplitude=UNSET)
 
 #######################################################################################
 
@@ -349,6 +385,11 @@ mdb.Job(name='Job%d' %tt, model='Model-1', description='', type=ANALYSIS,
 
 mdb.models['Model-1'].FieldOutputRequest(name='F-Output-2',
     createStepName='Step-1', variables=('IVOL', ))
+	mdb.models['Model-1'].FieldOutputRequest(name='F-Output-3',
+	    createStepName='Step-1', variables=('THE', ))
+	mdb.models['Model-1'].FieldOutputRequest(name='F-Output-4',
+	    createStepName='Step-1', variables=('TEMP', ))
+
 
 mdb.saveAs('/home/u23/tejakondury/ONYX/mod_2%d' %tt)
 ###########################################################################################
@@ -370,14 +411,16 @@ OdbName = 'Job%d.odb' %tt
 myodb = openOdb(path=OdbName)
 
 numFrames = len(myodb.steps['Step-1'].frames) #total number of frames
-
 vol = myodb.steps['Step-1'].frames[-1].fieldOutputs['IVOL']
 stress=myodb.steps['Step-1'].frames[-1].fieldOutputs['S']
-strain=myodb.steps['Step-1'].frames[-1].fieldOutputs['E']
+strain=myodb.steps['Step-1'].frames[-1].fieldOutputs['THE']  # thermal strain component
+temp=myodb.steps['Step-1'].frames[-1].fieldOutputs['TEMP']  # elemental temperature
+
 comp=0    # change here if you are loading in different direction other than x-direction
 totVol = 0.0
 totStress=0.0
 totStrain=0.0
+totTemp=0.0
 
 for j in range(0,len(vol.values)):
 	setVol = vol.values[j].data
@@ -388,21 +431,8 @@ for j in range(0,len(vol.values)):
 totStress=totStress/totVol
 totStrain=totStrain/totVol
 
-E_eff=totStress/totStrain # This is calculating sigma11/E11
+cte_eff=totStrain/totTemp # This is calculating sigma11/E11
 
-# Calculate the poissons ratio as well
-transStrain=0.0
-totVol=0.0
-comp=1 # This will reference E22ls
-
-for j in xrange(0,len(vol.values)):
-	setVol = vol.values[j].data
-	totVol += setVol
-	transStrain += strain.values[j].data[comp]*setVol
-
-# Poisson ratio
-pois_eff=-transStrain/totStrain
-
-f=open('results_emod_trans_composite','a')
-f.write(str(tt)+' '+str(E_eff)+' '+str(pois_eff)+"\n")
+f=open('results_cte','a')
+f.write(str(tt)+' '+str(cte_eff)+ "\n")
 f.close()
