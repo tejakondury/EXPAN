@@ -169,7 +169,7 @@ def temp_variation(tt):
     pk.dump(pois_pore_var,f,protocol=2)
 
     f=open('cte-mat%d' %tt, 'wb')
-    pk.dump(cte-mat_var,f,protocol=2)
+    pk.dump(cte_mat_var,f,protocol=2)
 
     f=open('cte-fib%d' %tt, 'wb')
     pk.dump(cte_fib_var,f,protocol=2)
