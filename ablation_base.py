@@ -131,11 +131,11 @@ def temp_variation(tt):
     # Expansion properties
     # matrix property taken from Cairns and Adams
     if tt<=448:
-        cte_mat_var=(4.9277+0.1224*tt)*10^-6
+        cte_mat_var=(4.9277+0.1224*tt)*10**-6
     else:
         cte_mat_var=59.76e-6
     # Fiber property taken from Pradere et al
-    cte_fib_var= (8.026-0.0008*tt-6e-7*tt^2-7e-21*tt^3)*10^(-6)  # values for PANEX33 at 300K (transverse)
+    cte_fib_var= (8.026-0.0008*tt-6e-7*tt**2-7e-21*tt**3)*10**-6  # values for PANEX33 at 300K (transverse)
     # transverse properties shows very weak dependnece with temperature
     # property valid for the entire range
     cte_pore_var= 0.0034 # taken from some random reference online, need to check for accuracy.
