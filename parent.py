@@ -15,8 +15,8 @@ from ablation_base import temp_variation
 print('The analysis has just begun...')
 
 # Temperature points for the analysis
-tems=[293,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,690]
-
+#tems=[293,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,690]
+tems=[650]
 for tt in tems:
     mat_vol,pore_vol=vol(tt)
     print ('pore volume at this temperature is: ',pore_vol)
@@ -86,7 +86,7 @@ for tt in tems:
     	f.write("\n")
     	f.write("cd /home/u23/tejakondury/EXPAN")
     	f.write("\n")
-     	f.write("abaqus cae noGUI=pore_cte.py")
+     	f.write("abaqus cae noGUI=pore_cte_hbc.py")
 	    f.close()
 
 

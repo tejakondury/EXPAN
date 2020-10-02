@@ -129,17 +129,21 @@ def temp_variation(tt):
     pois_mat_var=float(pois_m(tt))
 
     # Expansion properties
-    cte_mat_var=
-    cte_pore_var=
-    cte_fib_var=
-
+    # matrix property taken from Cairns and Adams
+    if tt<=448:
+        cte_mat_var=(4.9277+0.1224*tt)*10^-6
+    else:
+        cte_mat_var=59.76e-6
+    # Fiber property taken from Pradere et al
+    cte_fib_var= (8.026-0.0008*tt-6e-7*tt^2-7e-21*tt^3)*10^(-6)  # values for PANEX33 at 300K (transverse)
+    # transverse properties shows very weak dependnece with temperature
+    # property valid for the entire range
+    cte_pore_var= 0.0034 # taken from some random reference online, need to check for accuracy.
     # Thermal properties
-    cond_mat_var=
-    cond_pore_var=
+    # thermal properties are not changed because we are running a static analysis and conductivity values are not required
+    cond_mat_var=p.cond_mat
+    cond_pore_var=p.cond_pore
     cond_fib_var=p.cond_fib
-
-
-
 
 
     # dump the values in a binary
@@ -181,7 +185,7 @@ def temp_variation(tt):
 
     f=open('cond-pore%d' %tt, 'wb')
     pk.dump(cond_pore_var,f,protocol=2)
-    
+
 
 def vol(tt):
 # returns volume fractions of each phase
