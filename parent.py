@@ -87,7 +87,7 @@ for tt in tems:
     	f.write("cd /home/u23/tejakondury/EXPAN")
     	f.write("\n")
      	f.write("abaqus cae noGUI=pore_cte_hbc.py")
-	    f.close()
+	f.close()
 
 
 
@@ -97,7 +97,7 @@ for tt in tems:
         os.environ['p_tot']=str(p_tot)
 
 
-	    subprocess.call('qsub -v tt=$tt,mat_vol=$mat_vol,pr_vol=$pr_vol,p_tot=$p_tot run_p.job',shell=True)
+	subprocess.call('qsub -v tt=$tt,mat_vol=$mat_vol,pr_vol=$pr_vol,p_tot=$p_tot run_p.job',shell=True)
         time.sleep(45)
 
         print('analysis is submitted for temp',tt)
