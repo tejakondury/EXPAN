@@ -90,7 +90,7 @@ for k in range(N_pore):
 
 ########################################################################3
 mdb.models['Model-1'].Material(name='Matrix')
-mdb.models['Model-1'].Materials['Matrix'].Elastic(table=((mod_mat_var, pois_mat_var), ))
+mdb.models['Model-1'].materials['Matrix'].Elastic(table=((mod_mat_var, pois_mat_var), ))
 mdb.models['Model-1'].materials['Matrix'].Conductivity(table=((cond_mat_var),))
 mdb.models['Model-1'].materials['Matrix'].Expansion(table=((cte_mat_var),))
 
