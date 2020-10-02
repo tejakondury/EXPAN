@@ -439,7 +439,7 @@ for j in xrange(0,len(vol.values)):
     setVol = vol.values[j].data
     totVol += setVol
     totStress += stress.values[j].data[comp]*setVol
-	totStrain +=strain.values[j].data[comp]*setVol
+    totStrain +=strain.values[j].data[comp]*setVol
 
 totStress=totStress/totVol
 totStrain=totStrain/totVol
