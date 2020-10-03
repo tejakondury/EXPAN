@@ -91,13 +91,13 @@ for k in range(N_pore):
 ########################################################################3
 mdb.models['Model-1'].Material(name='Matrix')
 mdb.models['Model-1'].materials['Matrix'].Elastic(table=((mod_mat_var, pois_mat_var), ))
-mdb.models['Model-1'].materials['Matrix'].Conductivity(table=((cond_mat_var),))
-mdb.models['Model-1'].materials['Matrix'].Expansion(table=((cte_mat_var),))
+mdb.models['Model-1'].materials['Matrix'].Conductivity(table=((cond_mat_var,),))
+mdb.models['Model-1'].materials['Matrix'].Expansion(table=((cte_mat_var,),))
 
 mdb.models['Model-1'].Material(name='Pore')
 mdb.models['Model-1'].materials['Pore'].Elastic(table=((mod_pore_var, pois_pore_var), ))
-mdb.models['Model-1'].materials['Pore'].Conductivity(table=((cond_pore_var),))
-mdb.models['Model-1'].materials['Pore'].Expansion(table=((cte_pore_var),))
+mdb.models['Model-1'].materials['Pore'].Conductivity(table=((cond_pore_var,),))
+mdb.models['Model-1'].materials['Pore'].Expansion(table=((cte_pore_var,),))
 
 ##############################################################################
 # rectangle
@@ -439,7 +439,7 @@ for j in xrange(0,len(vol.values)):
     setVol = vol.values[j].data
     totVol += setVol
     totStress += stress.values[j].data[comp]*setVol
-    totStrain +=strain.values[j].data[comp]*setVol
+	totStrain +=strain.values[j].data[comp]*setVol
 
 totStress=totStress/totVol
 totStrain=totStrain/totVol
