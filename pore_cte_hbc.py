@@ -365,7 +365,8 @@ mdb.models['Model-1'].StaticStep(name='Step-1', previous='Initial')
 
 # Apply temperature loads as predefined field
 a = mdb.models['Model-1'].rootAssembly
-f=a.faces
+p = mdb.models['Model-1'].parts['Part-1']
+f=p.faces
 region=f.getByBoundingBox(0.0,0.0,0.0,1.0,1.0,0.0)
 # set initial temperature as 20 C
 mdb.models['Model-1'].Temperature(name='Predefined Field-1',
