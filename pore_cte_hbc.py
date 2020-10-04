@@ -366,8 +366,9 @@ mdb.models['Model-1'].StaticStep(name='Step-1', previous='Initial')
 # Apply temperature loads as predefined field
 a = mdb.models['Model-1'].rootAssembly
 p = mdb.models['Model-1'].parts['Part-1']
-f=p.faces
-region=f.getByBoundingBox(0.0,0.0,0.0,1.0,1.0,0.0)
+f=a.instances['Part-1-1'].faces
+f1=f.getByBoundingBox(0.0,0.0,0.0,1.0,1.0,0.0)
+region=a.Set(faces=f1,name='all')
 # set initial temperature as 20 C
 mdb.models['Model-1'].Temperature(name='Predefined Field-1',
 	createStepName='Initial', region=region, distributionType=UNIFORM,
@@ -384,7 +385,7 @@ region = a.sets['left']
 mdb.models['Model-1'].XsymmBC(name='BC-1', createStepName='Step-1',
 	region=region, localCsys=None)
 region=a.sets['bottom']
-mdb.models['Model-1'].YsymmBC(name='BC-2', createStepName='Steo-1',region=region,localCsys=None)
+mdb.models['Model-1'].YsymmBC(name='BC-2', createStepName='Step-1',region=region,localCsys=None)
 
 #######################################################################################
 
@@ -428,24 +429,24 @@ numFrames = len(myodb.steps['Step-1'].frames) #total number of frames
 vol = myodb.steps['Step-1'].frames[-1].fieldOutputs['IVOL']
 stress=myodb.steps['Step-1'].frames[-1].fieldOutputs['S']
 strain=myodb.steps['Step-1'].frames[-1].fieldOutputs['E']
-temp=myodb.steps['Step-1'].frames[-1].fieldOutputs['NT11']
+#temp=myodb.steps['Step-1'].frames[-1].fieldOutputs['NT11']
 #temp=myodb.steps['Step-1'].frames[-1].fieldOutputs['TEMP']
 comp=0;
 totVol = 0.0
 totStress=0.0
 totStrain=0.0
-totTemp-0.0
+totTemp=0.0
 
 for j in xrange(0,len(vol.values)):
     setVol = vol.values[j].data
     totVol += setVol
     totStress += stress.values[j].data[comp]*setVol
-	totStrain +=strain.values[j].data[comp]*setVol
+    totStrain +=strain.values[j].data[comp]*setVol
 
 totStress=totStress/totVol
 totStrain=totStrain/totVol
 # effective delta T is 80 C
-cte_eff=totStrain/80
+cte_eff=totStrain/80.0
 #E_eff=totStress/0.1
 
 

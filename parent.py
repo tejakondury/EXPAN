@@ -15,8 +15,8 @@ from ablation_base import temp_variation
 print('The analysis has just begun...')
 
 # Temperature points for the analysis
-#tems=[293,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,690]
-tems=[650]
+tems=[475,500,525,550,575,600,625,650,675,700]
+#tems=[650]
 for tt in tems:
     mat_vol,pore_vol=vol(tt)
     print ('pore volume at this temperature is: ',pore_vol)
@@ -94,7 +94,7 @@ for tt in tems:
         os.environ['tt']= str(tt)
     	os.environ['pr_vol']=str(pore_vol)
     	os.environ['mat_vol']=str(mat_vol)
-        os.environ['p_tot']=str(p_tot)
+        #os.environ['p_tot']=str(p_tot)
 
 
 	subprocess.call('qsub -v tt=$tt,mat_vol=$mat_vol,pr_vol=$pr_vol,p_tot=$p_tot run_p.job',shell=True)
