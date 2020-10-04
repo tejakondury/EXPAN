@@ -23,11 +23,17 @@ for i in xrange(len):
 
 for i in xrange(len):
     tk=tt[i]
-    cte_mat=e_matrix[i]
+    # matrix cte
+    cte_mat=cte_matrix[i]
     f=open('cte-mat%d'%tk,'wb')
     pk.dump(cte_mat,f,protocol=2)
-    #f.write(str(emod_mat))
     f.close()
+    # fiber cte
+    cte_fib=(8.026-0.0008*tk-6e-7*tk**2-7e-21*tk**3)*10**-6
+    f=open('cte-fib%d'%tk,'wb')
+    pk.dump(cte_fib,f,protocol=2)
+    f.close()
+
     # get other homogenized matrix values from previous simulations
     for j in xrange(len(data2)):
         if tk=data2[j][0]:    # For exact match
@@ -76,8 +82,7 @@ for i in xrange(len):
     f=open('cond-fib%d'%tk,'wb')
     pk.dump(p.cond_fib,f,protocol=2)
     f.close()
-    f=open('cte-fib%d'%tk,'wb')
-    pk.dump(p.cte_fib,f,protocol=2)
+
 
     f=open('run_p.job', 'w')
     f.write("#!/bin/bash")
@@ -92,14 +97,13 @@ for i in xrange(len):
     f.write("\n")
     f.write("#PBS -l place=free:shared")
     f.write("\n")
-    f.write("#PBS -l walltime=00:40:00")
+    f.write("#PBS -l walltime=00:10:00")
     f.write("\n")
-    f.write("#PBS -l cput=00:40:00")
+    f.write("#PBS -l cput=00:10:00")
     f.write("\n")
-    f.write("cd /home/u23/tejakondury/ONYX")
+    f.write("cd /home/u23/tejakondury/EXPAN")
     f.write("\n")
-    #f.write("abaqus cae noGUI=comp_emod_2d_fibs.py ")
-    f.write("abaqus cae noGUI=comp_emod_3d_fibs.py ")  # choose a different file for long props
+    f.write("abaqus cae noGUI=comp_cte_2d_fibs_hbc.py ")  # choose a different file for long props
     f.close()
 
     os.environ['tt']=str(tk)
