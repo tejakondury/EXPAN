@@ -11,17 +11,17 @@ data2=np.loadtxt('results_emod') # elastic modulus results
 data3=np.loadtxt('results_cond') # conductivity results
 #data1=np.loadtxt('stat_mat_output')   # use this while considering averaged first step results
 
-len=len(data1)
-tt=np.zeros(len)
-cte_matrix=np.zeros(len)
+lent=len(data1)
+tt=np.zeros(lent)
+cte_matrix=np.zeros(lent)
 
 
-for i in xrange(len):
+for i in xrange(lent):
     tt[i]=data1[i][0]
     cte_matrix[i]=data1[i][1]
 
 
-for i in xrange(len):
+for i in xrange(lent):
     tk=tt[i]
     # matrix cte
     cte_mat=cte_matrix[i]
@@ -36,7 +36,7 @@ for i in xrange(len):
 
     # get other homogenized matrix values from previous simulations
     for j in xrange(len(data2)):
-        if tk=data2[j][0]:    # For exact match
+        if tk==data2[j][0]:    # For exact match
             mod_mat=data2[j][1]
             pois_mat=data2[j][2]
 
@@ -57,7 +57,7 @@ for i in xrange(len):
 
     # for thermal conductivity of homogenized matrix
     for j in xrange(len(data3)):
-        if tk=data3[j][0]:
+        if tk==data3[j][0]:
             cond_mat=data3[j][1]
 
         elif tk!=data3[j][0]:
