@@ -43,6 +43,12 @@ for i in xrange(lent):
         elif tk!=data2[j][0]:
             print 'Exact temperature match not found for',tk
             print 'Using linear interpolation for elastic modulus'
+            # Assume raw data is not ordered or sorted
+            # first sort in increasing order of temperatures
+            # converting into a list to use default list sort
+            data2=data2.tolist()
+            # sorting
+            data2.sort()
             int_mod=interp1d(data2[:][0],data2[:][1])
             int_pois=interp1d(data2[:][0],data2[:][1])
             mod_mat=int_mod(tk)
@@ -63,6 +69,10 @@ for i in xrange(lent):
         elif tk!=data3[j][0]:
             print 'Exact temperature match not found for',tk
             print 'Using linear interpolation for conductivity'
+            # convert to list
+            data3=data3.tolist()
+            #sort
+            data3.sort()
             int_cond=interp1d(data3[:][0],data3[:][1])
             cond_mat=int_cond(tk)
 
