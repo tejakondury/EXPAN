@@ -49,8 +49,11 @@ for i in xrange(lent):
             data2=data2.tolist()
             # sorting
             data2.sort()
-            int_mod=interp1d(data2[:][0],data2[:][1])
-            int_pois=interp1d(data2[:][0],data2[:][1])
+            # converting back to ndarray
+            data2=np.array(data2)
+	    print(data2[:,0])	
+            int_mod=interp1d(data2[:,0],data2[:,1])
+            int_pois=interp1d(data2[:,0],data2[:,1])
             mod_mat=int_mod(tk)
             pois_mat=int_pois(tk)
 
@@ -73,7 +76,8 @@ for i in xrange(lent):
             data3=data3.tolist()
             #sort
             data3.sort()
-            int_cond=interp1d(data3[:][0],data3[:][1])
+            data3=np.array(data3)
+            int_cond=interp1d(data3[:,0],data3[:,1])
             cond_mat=int_cond(tk)
 
     f=open('cond-mat%d'%tk,'wb')
