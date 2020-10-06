@@ -50,7 +50,7 @@ Mdb
 data1 = np.loadtxt('ellipse_positions2' + '.txt',skiprows=2)
 print data1
 ctr = np.zeros(shape=(len(data1),3))
-pt1 = np.zeros(shape=(len(data	1),3))
+pt1 = np.zeros(shape=(len(data1),3))
 pt2 = np.zeros(shape=(len(data1),3))
 for i in xrange(len(data1)):
 	ctr[i]=data1[i][0:3]
