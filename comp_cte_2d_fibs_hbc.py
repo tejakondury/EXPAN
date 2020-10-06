@@ -15,31 +15,31 @@ import pickle as pk
 
 # Lumped phase properties
 f=open('mod-mat%d'%tt,'rb')
-mod_mat_var=pk.load(f)
+mod_mat_var=float(pk.load(f))
 f.close()
 f=open('pois-mat%d'%tt,'rb')
-pois_mat_var=pk.load(f)
+pois_mat_var=float(pk.load(f))
 f.close()
 f=open('cte-mat%d' %tt, 'rb')
-cte_mat_var=pk.load(f)
+cte_mat_var=float(pk.load(f))
 f.close()
 f=open('cond-mat%d'%tt,'rb')
-cond_mat_var=pk.load(f)
+cond_mat_var=float(pk.load(f))
 f.close()
 
 
 ## Fiber properties
 f=open('mod-fib%d'%tt,'rb')
-mod_fib_var=pk.load(f)
+mod_fib_var=float(pk.load(f))
 f.close()
 f=open('pois-fib%d'%tt,'rb')
-pois_fib_var=pk.load(f)
+pois_fib_var=float(pk.load(f))
 f.close()
 f=open('cte-fib%d'%tt,'rb')
-cte_fib_var=pk.load(f)
+cte_fib_var=float(pk.load(f))
 f.close()
 f=open('cond-fib%d'%tt,'rb')
-cond_fib_var=pk.load(f)
+cond_fib_var=float(pk.load(f))
 f.close()
 
 Mdb
