@@ -50,7 +50,7 @@ Mdb
 data1 = np.loadtxt('ellipse_positions2' + '.txt',skiprows=2)
 print data1
 ctr = np.zeros(shape=(len(data1),3))
-pt1 = np.zeros(shape=(len(data1),3))
+pt1 = np.zeros(shape=(len(data	1),3))
 pt2 = np.zeros(shape=(len(data1),3))
 for i in xrange(len(data1)):
 	ctr[i]=data1[i][0:3]
@@ -184,7 +184,7 @@ a.setElementType(regions=pickedRegions,elemTypes=(elemType1,))
 # Generate mesh
 a = mdb.models['Model-1'].rootAssembly
 partInstances =(a.instances['Part-1-1'], )
-a.seedPartInstance(regions=partInstances, size=0.05,deviationFactor=0.08,
+a.seedPartInstance(regions=partInstances, size=0.005,deviationFactor=0.08,
     minSizeFactor=0.1)
 a.generateMesh(regions=partInstances)
 
@@ -383,7 +383,7 @@ mdb.models['Model-1'].FieldOutputRequest(name='F-Output-5',
 		    createStepName='Step-1', variables=('EE', ))
 
 
-mdb.saveAs('/home/u23/tejakondury/ONYX/mod_2%d' %tt)
+mdb.saveAs('/home/u23/tejakondury/EXPAN/mod_2%d' %tt)
 ###########################################################################################
 
 #Submit job
