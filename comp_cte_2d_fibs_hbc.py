@@ -423,7 +423,7 @@ for j in range(0,len(vol.values)):
 totStress=totStress/totVol
 totStrain=totStrain/totVol
 
-cte_eff=totStrain/totTemp # This is calculating sigma11/E11
+cte_eff=totStrain/80.0 # This is calculating sigma11/E11
 
 f=open('results_comp_cte','a')
 f.write(str(tt)+' '+str(cte_eff)+ "\n")
