@@ -35,27 +35,29 @@ for i in xrange(lent):
     f.close()
 
     # get other homogenized matrix values from previous simulations
+    flag=0
     for j in xrange(len(data2)):
         if tk==data2[j][0]:    # For exact match
             mod_mat=data2[j][1]
             pois_mat=data2[j][2]
+            flag=1
 
-        elif tk!=data2[j][0]:
-            print 'Exact temperature match not found for',tk
-            print 'Using linear interpolation for elastic modulus'
-            # Assume raw data is not ordered or sorted
-            # first sort in increasing order of temperatures
-            # converting into a list to use default list sort
-            data2=data2.tolist()
-            # sorting
-            data2.sort()
-            # converting back to ndarray
-            data2=np.array(data2)
-	    print(data2[:,0])	
-            int_mod=interp1d(data2[:,0],data2[:,1])
-            int_pois=interp1d(data2[:,0],data2[:,1])
-            mod_mat=int_mod(tk)
-            pois_mat=int_pois(tk)
+    if flag==0:
+        print 'Exact temperature match not found for',tk
+        print 'Using linear interpolation for elastic modulus'
+        # Assume raw data is not ordered or sorted
+        # first sort in increasing order of temperatures
+        # converting into a list to use default list sort
+        data2=data2.tolist()
+        # sorting
+        data2.sort()
+        # converting back to ndarray
+        data2=np.array(data2)
+        #print(data2[:,0])
+        int_mod=interp1d(data2[:,0],data2[:,1])
+        int_pois=interp1d(data2[:,0],data2[:,1])
+        mod_mat=int_mod(tk)
+        pois_mat=int_pois(tk)
 
     f=open('mod-mat%d'%tk,'wb')
     pk.dump(mod_mat,f,protocol=2)
@@ -65,20 +67,22 @@ for i in xrange(lent):
     f.close()
 
     # for thermal conductivity of homogenized matrix
+    flag2=0
     for j in xrange(len(data3)):
         if tk==data3[j][0]:
             cond_mat=data3[j][1]
+            flag2=1
 
-        elif tk!=data3[j][0]:
-            print 'Exact temperature match not found for',tk
-            print 'Using linear interpolation for conductivity'
-            # convert to list
-            data3=data3.tolist()
-            #sort
-            data3.sort()
-            data3=np.array(data3)
-            int_cond=interp1d(data3[:,0],data3[:,1])
-            cond_mat=int_cond(tk)
+    if flag2==0:
+        print 'Exact temperature match not found for',tk
+        print 'Using linear interpolation for conductivity'
+        # convert to list
+        data3=data3.tolist()
+        #sort
+        data3.sort()
+        data3=np.array(data3)
+        int_cond=interp1d(data3[:,0],data3[:,1])
+        cond_mat=int_cond(tk)
 
     f=open('cond-mat%d'%tk,'wb')
     pk.dump(cond_mat,f,protocol=2)
