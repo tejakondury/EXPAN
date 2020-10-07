@@ -13,28 +13,35 @@ import os
 import numpy as np
 import pickle as pk
 
-# get initial data
-from __main__ import *
-# read conductivity values from previous step
-f=open('emod_mat%d'%tt,'r')
-mod_mat_var=f.read()
-mod_mat_var=float(mod_mat_var)
+# Get initial data from the 1st step
+
+# Lumped phase properties
+f=open('mod-mat%d'%tt,'rb')
+mod_mat_var=float(pk.load(f))
+f.close()
+f=open('pois-mat%d'%tt,'rb')
+pois_mat_var=float(pk.load(f))
+f.close()
+f=open('cte-mat%d' %tt, 'rb')
+cte_mat_var=float(pk.load(f))
+f.close()
+f=open('cond-mat%d'%tt,'rb')
+cond_mat_var=float(pk.load(f))
 f.close()
 
-f=open('pois_mat%d'%tt,'r')
-pois_mat_var=f.read()
-pois_mat_var=float(pois_mat_var)
-f.close()
 
-# check fiber properties!!!!
-f=open('mod-fib%d'%tt,'r')
-mod_fib_var=f.read()
-mod_fib_var=float(mod_fib_var)
+## Fiber properties
+f=open('mod-fib%d'%tt,'rb')
+mod_fib_var=float(pk.load(f))
 f.close()
-
-f=open('pois-fib%d' %tt,'r')
-pois_fib_var=f.read()
-pois_fib_var=float(pois_fib_var)
+f=open('pois-fib%d'%tt,'rb')
+pois_fib_var=float(pk.load(f))
+f.close()
+f=open('cte-fib%d'%tt,'rb')
+cte_fib_var=float(pk.load(f))
+f.close()
+f=open('cond-fib%d'%tt,'rb')
+cond_fib_var=float(pk.load(f))
 f.close()
 
 
@@ -68,9 +75,15 @@ N=N_fiber+N_pore
 # Create material properties
 mdb.models['Model-1'].Material(name='Fiber')
 mdb.models['Model-1'].materials['Fiber'].Elastic(table=((mod_fib_var, pois_fib_var), ))
+mdb.models['Model-1'].materials['Fiber'].Conductivity(table=((cond_fib_var,), ))
+mdb.models['Model-1'].materials['Fiber'].Expansion(table=((cte_fib_var,), ))
+
 
 mdb.models['Model-1'].Material(name='Matrix')
 mdb.models['Model-1'].materials['Matrix'].Elastic(table=((mod_mat_var, pois_mat_var), ))
+mdb.models['Model-1'].materials['Matrix'].Conductivity(table=((cond_mat_var,), ))
+mdb.models['Model-1'].materials['Matrix'].Expansion(table=((cte_mat_var,), ))
+
 ######################################################################
 # Make a cube
 s = mdb.models['Model-1'].ConstrainedSketch(name='__profile__',
@@ -321,104 +334,41 @@ for i in n6:
     nodeset = a.SetFromNodeLabels(name = setName,nodeLabels = (('composite-1', (i[3],),),),)
     nodeno6 += 1
 ##########################################################################
-# Create dummy nodes (3)
-
-# Dummy node for left-right face
-a = mdb.models['Model-1'].rootAssembly
-a.ReferencePoint(point=(-W/2.0,H/2.0,D/2.0))
-mdb.models['Model-1'].rootAssembly.features.changeKey(fromName='RP-1',
-toName='dummy L-R')
-
-# Create a set of dummy node
-r1 = a.referencePoints
-keys = r1.keys()
-val1 = keys[0]
-dummy=(r1[val1], )
-a.Set(referencePoints=dummy, name='dummy L-R')
-
-# Dummy node for Top-Bottom face
-a = mdb.models['Model-1'].rootAssembly
-a.ReferencePoint(point=(W/2.0,-H/2.0, D/2.0))
-mdb.models['Model-1'].rootAssembly.features.changeKey(fromName='RP-1',
-toName='dummy T-B')
-# Create a set
-r1 = a.referencePoints
-keys = r1.keys()
-val2 = keys[0]
-dummy=(r1[val2], )
-a.Set(referencePoints=dummy, name='dummy T-B')
-
-
-# Dummy node for front-back face
-a = mdb.models['Model-1'].rootAssembly
-a.ReferencePoint(point=(W/2.0,H/2.0,-D/2.0))
-mdb.models['Model-1'].rootAssembly.features.changeKey(fromName='RP-1',
-toName='dummy F-B')
-
-# Create a set of dummy node
-r1 = a.referencePoints
-keys = r1.keys()
-val3 = keys[0]
-dummy=(r1[val3], )
-a.Set(referencePoints=dummy, name='dummy F-B')
-
-#mdb.saveAs('/home/u23/tejakondury/RUBY1/mod%d' %tt)
 
 
 ###############################################################################
-# Applying constraint equations
-#Apply constraint equation to each corresponding node for Periodic Boundary Condition (left to right faces, x faces)
-for j in range(1,nodeno1):
-
-    mdb.models['Model-1'].Equation(name='LeftRight-xdisp-Constraint-%d'%(j), terms=((1.0, 'LeftNode-%d'%(j), 1), (-1.0, 'RightNode-%d'%(j), 1),(-1.0, 'dummy L-R', 1)))
-    mdb.models['Model-1'].Equation(name='LeftRight-ydisp-Constraint-%d'%(j), terms=((1.0, 'LeftNode-%d'%(j), 2), (-1.0, 'RightNode-%d'%(j), 2),(-1.0, 'dummy L-R', 2)))
-    mdb.models['Model-1'].Equation(name='LeftRight-zdisp-Constraint-%d'%(j), terms=((1.0, 'LeftNode-%d'%(j), 3), (-1.0, 'RightNode-%d'%(j), 3),(-1.0, 'dummy L-R', 3)))
-#Apply constraint equation to each corresponding node for Periodic Boundary Condition (top to bottom faces, y faces)
-for j in range(1,nodeno3):
-
-    mdb.models['Model-1'].Equation(name='TopBottom-xdisp-Constraint-%d'%(j), terms=((1.0, 'TopNode-%d'%(j), 1), (-1.0, 'BottomNode-%d'%(j), 1),(-1.0, 'dummy T-B', 1)))
-    mdb.models['Model-1'].Equation(name='TopBottom-ydisp-Constraint-%d'%(j), terms=((1.0, 'TopNode-%d'%(j), 2), (-1.0, 'BottomNode-%d'%(j), 2),(-1.0, 'dummy T-B', 2)))
-    mdb.models['Model-1'].Equation(name='TopBottom-zdisp-Constraint-%d'%(j), terms=((1.0, 'TopNode-%d'%(j), 3), (-1.0, 'BottomNode-%d'%(j), 3),(-1.0, 'dummy T-B', 3)))
-
-#Apply constraint equation to each corresponding node for Periodic Boundary Condition (front to back faces, z faces)
-for j in range(1,nodeno5):
-
-    mdb.models['Model-1'].Equation(name='FrontBack-xdisp-Constraint-%d'%(j), terms=((1.0, 'FrontNode-%d'%(j), 1), (-1.0, 'BackNode-%d'%(j), 1),(-1.0, 'dummy F-B', 1)))
-    mdb.models['Model-1'].Equation(name='FrontBack-ydisp-Constraint-%d'%(j), terms=((1.0, 'FrontNode-%d'%(j), 2), (-1.0, 'BackNode-%d'%(j), 2),(-1.0, 'dummy F-B', 2)))
-    mdb.models['Model-1'].Equation(name='FrontBack-zdisp-Constraint-%d'%(j), terms=((1.0, 'FrontNode-%d'%(j), 3), (-1.0, 'BackNode-%d'%(j), 3),(-1.0, 'dummy F-B', 3)))
-
+#
 ###################################################################################
 # Create step
 a = mdb.models['Model-1'].rootAssembly
 mdb.models['Model-1'].StaticStep(name='Step-1', previous='Initial')
 #####################################################################################
 # Apply boundary conditions on dummy nodes
+# Applying HBC
+# In the x-direction
+# Apply temperature loads as predefined field
 a = mdb.models['Model-1'].rootAssembly
-r1 = a.referencePoints
-refPoints1=dummy=(r1[val3], )
-region = regionToolset.Region(referencePoints=refPoints1)
-mdb.models['Model-1'].DisplacementBC(name='BC-1', createStepName='Step-1',
-    region=region,u1=0.0,u2=0.0,u3=0.1, amplitude=UNSET, fixed=OFF,
-    distributionType=UNIFORM, fieldName='' )
+p = mdb.models['Model-1'].parts['Part-1']
+f=a.instances['Part-1-1'].faces
+f1=f.getByBoundingBox(0.0,0.0,0.0,1.0,1.0,1.0)
+region=a.Set(faces=f1,name='all')
+# set initial temperature as 20 C
+mdb.models['Model-1'].Temperature(name='Predefined Field-1',
+	createStepName='Initial', region=region, distributionType=UNIFORM,
+	crossSectionDistribution=CONSTANT_THROUGH_THICKNESS, magnitudes=(20.0,
+	))
+# raise to final temperature of 100 C
+mdb.models['Model-1'].Temperature(name='Predefined Field-2',
+	createStepName='Step-1', region=region, distributionType=UNIFORM,
+	crossSectionDistribution=CONSTANT_THROUGH_THICKNESS, magnitudes=(100.0,
+	))
 
-#### change BCs!!!!!
-# left-right
-a = mdb.models['Model-1'].rootAssembly
-r1 = a.referencePoints
-refPoints1=dummy=(r1[val1], )
-region = regionToolset.Region(referencePoints=refPoints1)
-mdb.models['Model-1'].DisplacementBC(name='BC-2', createStepName='Step-1',
-     region=region,u2=0.0,u3=0.0, amplitude=UNSET, fixed=OFF,
-     distributionType=UNIFORM, fieldName='' )
-
-# top-bottom
-a = mdb.models['Model-1'].rootAssembly
-r1 = a.referencePoints
-refPoints1=dummy=(r1[val2], )
-region = regionToolset.Region(referencePoints=refPoints1)
-mdb.models['Model-1'].DisplacementBC(name='BC-3', createStepName='Step-1',
-     region=region,u1=0.0,u3=0.0, amplitude=UNSET, fixed=OFF,
-     distributionType=UNIFORM, fieldName='' )
+# Apply homogenuous Boundary conditions
+region = a.sets['left-face']
+mdb.models['Model-1'].XsymmBC(name='BC-1', createStepName='Step-1',
+	region=region, localCsys=None)
+region=a.sets['bottom-face']
+mdb.models['Model-1'].YsymmBC(name='BC-2', createStepName='Step-1',region=region,localCsys=None)
 
 
 #######################################################################################
@@ -430,11 +380,18 @@ memoryUnits=PERCENTAGE, getMemoryFromAnalysis=True,
 explicitPrecision=SINGLE, nodalOutputPrecision=SINGLE, echoPrint=OFF,
 modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='',
 scratch='', multiprocessingMode=DEFAULT, numCpus=1, numGPUs=0)
-#mdb.jobs['Job-1'].setValues(multiprocessingMode=MPI,numCpus=3, numDomains=3)
+
 mdb.models['Model-1'].FieldOutputRequest(name='F-Output-2',
 createStepName='Step-1', variables=('IVOL', ))
+mdb.models['Model-1'].FieldOutputRequest(name='F-Output-3',
+	    createStepName='Step-1', variables=('THE', ))
+mdb.models['Model-1'].FieldOutputRequest(name='F-Output-4',
+	    createStepName='Step-1', variables=('TEMP', ))
+mdb.models['Model-1'].FieldOutputRequest(name='F-Output-5',
+		    createStepName='Step-1', variables=('EE', ))
 
-mdb.saveAs('/home/u23/tejakondury/ONYX/mod3_%d' %tt)
+
+mdb.saveAs('/home/u23/tejakondury/EXPAN/mod3_%d' %tt)
 ###########################################################################################
 
 #Submit job
@@ -457,7 +414,7 @@ numFrames = len(myodb.steps['Step-1'].frames) #total number of frames
 vol = myodb.steps['Step-1'].frames[-1].fieldOutputs['IVOL']
 stress=myodb.steps['Step-1'].frames[-1].fieldOutputs['S']
 strain=myodb.steps['Step-1'].frames[-1].fieldOutputs['E']
-comp=2    # change here if you are loading in different direction other than x-direction
+comp=0    # change here if you are loading in different direction other than x-direction
 totVol = 0.0
 totStress=0.0
 totStrain=0.0
@@ -471,21 +428,8 @@ for j in range(0,len(vol.values)):
 totStress=totStress/totVol
 totStrain=totStrain/totVol
 
-E_eff=totStress/totStrain # This is calculating sigma11/E11
+cte_eff=totStrain/80.0
 
-# Calculate the poissons ratio as well
-transStrain=0.0
-totVol=0.0
-comp=1 # This will reference E22ls
-
-for j in xrange(0,len(vol.values)):
-	setVol = vol.values[j].data
-	totVol += setVol
-	transStrain += strain.values[j].data[comp]*setVol
-
-# Poisson ratio
-pois_eff=-transStrain/totStrain
-
-f=open('results_emod_long_composite','a')
-f.write(str(tt)+' '+str(E_eff)+' '+str(pois_eff)+"\n")
+f=open('results_comp_long_cte','a')
+f.write(str(tt)+' '+str(cte_eff)+"\n")
 f.close()
