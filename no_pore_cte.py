@@ -109,7 +109,7 @@ a.Instance(name='Part-1-1', part=p, dependent=OFF)
 
 
 # Assign element types
-elemType1=mesh.ElemType(elemCode=CPE4T,elemLibrary=STANDARD)
+elemType1=mesh.ElemType(elemCode=CPS4R,elemLibrary=STANDARD)
 p=mdb.models['Model-1'].parts['Part-1']
 a = mdb.models['Model-1'].rootAssembly
 f1 =a.instances['Part-1-1'].faces
@@ -269,28 +269,30 @@ for j in range(1,nodeno3):
 
 ###################################################################################
 
-mdb.models['Model-1'].CoupledTempDisplacementStep(name='Step-1',
-        previous='Initial', response=STEADY_STATE, deltmx=None, cetol=None,
-        creepIntegration=None, amplitude=RAMP)
+mdb.models['Model-1'].StaticStep(name='Step-1', previous='Initial')
 
 ######################################################################################
 
-# Apply BCs
+# Applying HBC
+# In the x-direction
+# Apply temperature loads as predefined field
 a = mdb.models['Model-1'].rootAssembly
-r1 = a.referencePoints
-refPoints1=dummy=(r1[val1], )
-region = regionToolset.Region(referencePoints=refPoints1)
-mdb.models['Model-1'].DisplacementBC(name='BC-1', createStepName='Step-1',
-    region=region,u1=0.0,u2=0.0,ur3=UNSET, amplitude=UNSET, fixed=OFF,
-    distributionType=UNIFORM, fieldName='' )
+p = mdb.models['Model-1'].parts['Part-1']
+f=a.instances['Part-1-1'].faces
+f1=f.getByBoundingBox(0.0,0.0,0.0,1.0,1.0,0.0)
+region=a.Set(faces=f1,name='all')
+# set initial temperature as 20 C
+mdb.models['Model-1'].Temperature(name='Predefined Field-1',
+	createStepName='Initial', region=region, distributionType=UNIFORM,
+	crossSectionDistribution=CONSTANT_THROUGH_THICKNESS, magnitudes=(20.0,
+	))
+# raise to final temperature of 100 C
+mdb.models['Model-1'].Temperature(name='Predefined Field-2',
+	createStepName='Step-1', region=region, distributionType=UNIFORM,
+	crossSectionDistribution=CONSTANT_THROUGH_THICKNESS, magnitudes=(100.0,
+	))
 
-a=mdb.models['Model-1'].rootAssembly
-f1 = a.instances['Part-1-1'].faces
-faces1=f1.getByBoundingBox(0,0,0,1,1,0)
-region=(faces1,)
-mdb.models['Model-1'].TemperatureBC(name='BC-2', createStepName='Step-1',
-	region=region, fixed=OFF, distributionType=UNIFORM, fieldName='',
-	magnitude=100.0, amplitude=UNSET)
+######################################################################################
 
 #######################################################################################
 
@@ -335,7 +337,7 @@ numFrames = len(myodb.steps['Step-1'].frames) #total number of frames
 vol = myodb.steps['Step-1'].frames[-1].fieldOutputs['IVOL']
 stress=myodb.steps['Step-1'].frames[-1].fieldOutputs['S']
 strain=myodb.steps['Step-1'].frames[-1].fieldOutputs['THE']
-temp=myodb.steps['Step-1'].frames[-1].fieldOutputs['TEMP']
+#temp=myodb.steps['Step-1'].frames[-1].fieldOutputs['TEMP']
 #temp=myodb.steps['Step-1'].frames[-1].fieldOutputs['TEMP']
 comp=0;    # change here if you are loading in different direction other than x-direction
 totVol = 0.0
@@ -353,7 +355,7 @@ for j in xrange(0,len(vol.values)):
 totStress=totStress/totVol
 totStrain=totStrain/totVol
 
-cte_eff=totStrain/totTemp
+cte_eff=totStrain/80.0
 
 #E_eff=totStress/totStrain # This is calculating sigma11/E11
 
