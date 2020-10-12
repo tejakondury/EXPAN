@@ -135,7 +135,8 @@ def temp_variation(tt):
     else:
         cte_mat_var=59.76e-6
     # Fiber property taken from Pradere et al
-    cte_fib_var= (8.026-0.0008*tt-6e-7*tt**2-7e-21*tt**3)*10**-6  # values for PANEX33 at 300K (transverse)
+    #cte_fib_var= (8.026-0.0008*tt-6e-7*tt**2-7e-21*tt**3)*10**-6  # values for PANEX33 at 300K (transverse)
+    cte_fib_var=(-2.742+0.0082*tt-5e-6*tt**2+1e-9*tt**3)*10**-6  # values for PANEX33 at 300K (long)
     # transverse properties shows very weak dependnece with temperature
     # property valid for the entire range
     cte_pore_var= 0.0034 # taken from some random reference online, need to check for accuracy.

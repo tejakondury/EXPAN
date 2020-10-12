@@ -7,8 +7,10 @@ import pickle as pk
 from scipy.interpolate import interp1d
 
 data1 =np.loadtxt('results_cte')
-data2=np.loadtxt('results_emod') # elastic modulus results
-data3=np.loadtxt('results_cond') # conductivity results
+#data2=np.loadtxt('results_emod') # elastic modulus results
+data2=np.loadtxt('results_emod_long')
+#data3=np.loadtxt('results_cond') # conductivity results
+data3=np.loadtxt('results_cond_long')
 #data1=np.loadtxt('stat_mat_output')   # use this while considering averaged first step results
 
 lent=len(data1)
@@ -29,7 +31,8 @@ for i in xrange(lent):
     pk.dump(cte_mat,f,protocol=2)
     f.close()
     # fiber cte
-    cte_fib=(8.026-0.0008*tk-6e-7*tk**2-7e-21*tk**3)*10**-6
+    #cte_fib=(8.026-0.0008*tk-6e-7*tk**2-7e-21*tk**3)*10**-6
+    cte_fib=(-2.742+0.0082*tk-5e-6*tk**2+1e-9*tk**3)*10**-6
     f=open('cte-fib%d'%tk,'wb')
     pk.dump(cte_fib,f,protocol=2)
     f.close()
@@ -55,7 +58,7 @@ for i in xrange(lent):
         data2=np.array(data2)
         #print(data2[:,0])
         int_mod=interp1d(data2[:,0],data2[:,1])
-        int_pois=interp1d(data2[:,0],data2[:,1])
+        int_pois=interp1d(data2[:,0],data2[:,2])
         mod_mat=int_mod(tk)
         pois_mat=int_pois(tk)
 
@@ -121,7 +124,7 @@ for i in xrange(lent):
     f.write("\n")
     f.write("cd /home/u23/tejakondury/EXPAN")
     f.write("\n")
-    f.write("abaqus cae noGUI=comp_cte_2d_fibs_hbc.py ")  # choose a different file for long props
+    f.write("abaqus cae noGUI=comp_cte_3d_fibs_hbc.py ")  # choose a different file for long props
     f.close()
 
     os.environ['tt']=str(tk)

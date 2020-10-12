@@ -52,8 +52,8 @@ N=N_fiber+N_pore
 
 mdb.models['Model-1'].Material(name='Matrix')
 mdb.models['Model-1'].materials['Matrix'].Elastic(table=((mod_mat_var, pois_mat_var), ))
-mdb.models['Model-1'].materials['Matrix'].Conductivity(table=((cond_mat_var),))
-mdb.models['Model-1'].materials['Matrix'].Expansion(table=((cte_mat_var),))
+mdb.models['Model-1'].materials['Matrix'].Conductivity(table=((cond_mat_var,),))
+mdb.models['Model-1'].materials['Matrix'].Expansion(table=((cte_mat_var,),))
 ##############################################################################
 # rectangle
 s = mdb.models['Model-1'].ConstrainedSketch(name='__profile__',
@@ -350,7 +350,7 @@ for j in xrange(0,len(vol.values)):
 	totVol += setVol
 	totStress += stress.values[j].data[comp]*setVol
 	totStrain += strain.values[j].data[comp]*setVol
-	totTemp +=temp.values[j].data*setVol
+	#totTemp +=temp.values[j].data*setVol
 
 totStress=totStress/totVol
 totStrain=totStrain/totVol
@@ -360,6 +360,6 @@ cte_eff=totStrain/80.0
 #E_eff=totStress/totStrain # This is calculating sigma11/E11
 
 
-f=open('results_cte','a')
+f=open('results_cte_2','a')
 f.write(str(tt)+' '+str(cte_eff)+ "\n")
 f.close()

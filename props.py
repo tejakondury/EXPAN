@@ -27,8 +27,8 @@ rho4=1.0
 
 mod_mat= 4.24  #Gpa (Banea et al 2012) # value reset in temperaturue variation.py
 pois_mat= 0.38
-mod_fib=19   # Gpa Sun 1996, Cairns et al  # transverse properties
-#mod_fib=231 # Gpa long props # manufacturer value
+#mod_fib=19   # Gpa Sun 1996, Cairns et al  # transverse properties
+mod_fib=231 # Gpa long props # manufacturer value
 pois_fib=0.2 # Sun 1996, Cairns et al
 mod_pore=0.00000001
 pois_pore=0.1

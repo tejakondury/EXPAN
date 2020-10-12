@@ -348,8 +348,8 @@ mdb.models['Model-1'].StaticStep(name='Step-1', previous='Initial')
 # In the x-direction
 # Apply temperature loads as predefined field
 a = mdb.models['Model-1'].rootAssembly
-p = mdb.models['Model-1'].parts['Part-1']
-f=a.instances['Part-1-1'].faces
+p = mdb.models['Model-1'].parts['composite']
+f=a.instances['composite-1'].faces
 f1=f.getByBoundingBox(0.0,0.0,0.0,1.0,1.0,1.0)
 region=a.Set(faces=f1,name='all')
 # set initial temperature as 20 C
@@ -414,7 +414,7 @@ numFrames = len(myodb.steps['Step-1'].frames) #total number of frames
 vol = myodb.steps['Step-1'].frames[-1].fieldOutputs['IVOL']
 stress=myodb.steps['Step-1'].frames[-1].fieldOutputs['S']
 strain=myodb.steps['Step-1'].frames[-1].fieldOutputs['E']
-comp=0    # change here if you are loading in different direction other than x-direction
+comp=2    # change here if you are loading in different direction other than x-direction
 totVol = 0.0
 totStress=0.0
 totStrain=0.0
