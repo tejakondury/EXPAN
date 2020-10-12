@@ -364,11 +364,27 @@ mdb.models['Model-1'].Temperature(name='Predefined Field-2',
 	))
 
 # Apply homogenuous Boundary conditions
-region = a.sets['left-face']
-mdb.models['Model-1'].XsymmBC(name='BC-1', createStepName='Step-1',
-	region=region, localCsys=None)
 region=a.sets['bottom-face']
-mdb.models['Model-1'].YsymmBC(name='BC-2', createStepName='Step-1',region=region,localCsys=None)
+mdb.models['Model-1'].DisplacementBC(name='BC-1',createStepName='Step-1',region=region,
+u1=0.0,u2=0.0,amplitude=UNSET,fixed=OFF,distributionType=UNIFORM,fieldName='')
+
+region=a.sets['left-face']
+mdb.models['Model-1'].DisplacementBC(name='BC-1',createStepName='Step-1',region=region,
+u1=0.0,u2=0.0,amplitude=UNSET,fixed=OFF,distributionType=UNIFORM,fieldName='')
+
+region=a.sets['right-face']
+mdb.models['Model-1'].DisplacementBC(name='BC-1',createStepName='Step-1',region=region,
+u1=0.0,u2=0.0,amplitude=UNSET,fixed=OFF,distributionType=UNIFORM,fieldName='')
+
+region=a.sets['top-face']
+mdb.models['Model-1'].DisplacementBC(name='BC-1',createStepName='Step-1',region=region,
+u1=0.0,u2=0.0,amplitude=UNSET,fixed=OFF,distributionType=UNIFORM,fieldName='')
+
+# region = a.sets['left-face']
+# mdb.models['Model-1'].XsymmBC(name='BC-1', createStepName='Step-1',
+# 	region=region, localCsys=None)
+# region=a.sets['bottom-face']
+# mdb.models['Model-1'].YsymmBC(name='BC-2', createStepName='Step-1',region=region,localCsys=None)
 
 
 #######################################################################################
